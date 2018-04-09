@@ -1,5 +1,6 @@
 package com.skyfaith;
 
+import com.skyfaith.view.CustomSplash;
 import com.skyfaith.view.MainStageView;
 import de.felixroske.jfxsupport.AbstractJavaFxApplicationSupport;
 import javafx.scene.control.Alert;
@@ -57,7 +58,7 @@ import java.sql.Statement;
 public class MainApp extends AbstractJavaFxApplicationSupport{
     private static final String URL = "jdbc:sqlite:C:/db/emslabel.db";
     public static void main(String[] args) {
-        launchApp(MainApp.class, MainStageView.class, args);
+        launchApp(MainApp.class, MainStageView.class,new CustomSplash(),args);
     }
     @Override
     public void start(Stage stage) throws Exception {
