@@ -1,6 +1,5 @@
 package com.skyfaith.domain;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -815,52 +814,52 @@ public class EmsOrderExample {
             return (Criteria) this;
         }
 
-        public Criteria andDeclaredvalueEqualTo(BigDecimal value) {
+        public Criteria andDeclaredvalueEqualTo(Double value) {
             addCriterion("DeclaredValue =", value, "declaredvalue");
             return (Criteria) this;
         }
 
-        public Criteria andDeclaredvalueNotEqualTo(BigDecimal value) {
+        public Criteria andDeclaredvalueNotEqualTo(Double value) {
             addCriterion("DeclaredValue <>", value, "declaredvalue");
             return (Criteria) this;
         }
 
-        public Criteria andDeclaredvalueGreaterThan(BigDecimal value) {
+        public Criteria andDeclaredvalueGreaterThan(Double value) {
             addCriterion("DeclaredValue >", value, "declaredvalue");
             return (Criteria) this;
         }
 
-        public Criteria andDeclaredvalueGreaterThanOrEqualTo(BigDecimal value) {
+        public Criteria andDeclaredvalueGreaterThanOrEqualTo(Double value) {
             addCriterion("DeclaredValue >=", value, "declaredvalue");
             return (Criteria) this;
         }
 
-        public Criteria andDeclaredvalueLessThan(BigDecimal value) {
+        public Criteria andDeclaredvalueLessThan(Double value) {
             addCriterion("DeclaredValue <", value, "declaredvalue");
             return (Criteria) this;
         }
 
-        public Criteria andDeclaredvalueLessThanOrEqualTo(BigDecimal value) {
+        public Criteria andDeclaredvalueLessThanOrEqualTo(Double value) {
             addCriterion("DeclaredValue <=", value, "declaredvalue");
             return (Criteria) this;
         }
 
-        public Criteria andDeclaredvalueIn(List<BigDecimal> values) {
+        public Criteria andDeclaredvalueIn(List<Double> values) {
             addCriterion("DeclaredValue in", values, "declaredvalue");
             return (Criteria) this;
         }
 
-        public Criteria andDeclaredvalueNotIn(List<BigDecimal> values) {
+        public Criteria andDeclaredvalueNotIn(List<Double> values) {
             addCriterion("DeclaredValue not in", values, "declaredvalue");
             return (Criteria) this;
         }
 
-        public Criteria andDeclaredvalueBetween(BigDecimal value1, BigDecimal value2) {
+        public Criteria andDeclaredvalueBetween(Double value1, Double value2) {
             addCriterion("DeclaredValue between", value1, value2, "declaredvalue");
             return (Criteria) this;
         }
 
-        public Criteria andDeclaredvalueNotBetween(BigDecimal value1, BigDecimal value2) {
+        public Criteria andDeclaredvalueNotBetween(Double value1, Double value2) {
             addCriterion("DeclaredValue not between", value1, value2, "declaredvalue");
             return (Criteria) this;
         }

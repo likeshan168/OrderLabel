@@ -1,7 +1,6 @@
 package com.skyfaith.service;
 
 import com.skyfaith.domain.EmsOrder;
-import com.skyfaith.domain.EmsOrderExample;
 
 import java.util.List;
 

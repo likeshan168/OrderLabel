@@ -14,9 +14,7 @@ spring:
   profiles:
     active: dev
   datasource:
-    url: jdbc:sqlserver://localhost:1433;DatabaseName=EMSLabel
-    username: ems
-    password: ems*64586103
-    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    url: jdbc:sqlite:C:/db/emslabel.db
+    driver-class-name: org.sqlite.JDBC
     # 使用druid数据源
     type: com.alibaba.druid.pool.DruidDataSource

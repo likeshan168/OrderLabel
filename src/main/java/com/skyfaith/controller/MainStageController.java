@@ -2,11 +2,9 @@ package com.skyfaith.controller;
 
 import com.skyfaith.MainApp;
 import com.skyfaith.domain.EmsOrder;
-import com.skyfaith.domain.EmsOrderExample;
 import com.skyfaith.service.EmsOrderService;
 import com.skyfaith.util.BarCodeUtils;
 import com.skyfaith.util.ExcelHelper;
-import com.skyfaith.view.MainStageView;
 import de.felixroske.jfxsupport.FXMLController;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -14,20 +12,14 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.print.*;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
 
 import javax.annotation.Resource;
 import java.io.File;
-import java.net.InetAddress;
 import java.net.URL;
-import java.security.spec.ECField;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -141,7 +133,7 @@ public class MainStageController implements Initializable {
             alert.setContentText("客户编码不能为空！");
             alert.show();
             return;
-        } else if (customeCodeField.getText().isEmpty()) {
+        } else if (yanshiField.getText().isEmpty()) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("提示");
             alert.setHeaderText("错误信息");

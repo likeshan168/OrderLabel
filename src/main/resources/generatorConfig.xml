@@ -2,7 +2,7 @@
 <!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
         "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd" >
 <generatorConfiguration>
-    <classPathEntry location="C:\Users\Administrator\.Rider2017.3\config\jdbc-drivers\SQL Server\6.0.8112.100\sqljdbc42-6.0.8112.100.jar"/>
+    <classPathEntry location="D:\maven_repository\repository\org\xerial\sqlite-jdbc\3.21.0\sqlite-jdbc-3.21.0.jar"/>
     <context id="context1">
         <!--<property name="autoDelimitKeywords" value="true" />-->
         <!--<property name="beginningDelimiter" value="[" />-->
@@ -13,9 +13,9 @@
             <property name="suppressAllComments" value="true"/>
         </commentGenerator>
         <!-- 数据库连接 -->
-        <jdbcConnection driverClass="com.microsoft.sqlserver.jdbc.SQLServerDriver"
-                        connectionURL="jdbc:sqlserver://101.201.28.235:1433;DatabaseName=EMSLabel"
-                        userId="ems" password="ems*64586103" />
+        <jdbcConnection driverClass="org.sqlite.JDBC"
+                        connectionURL="jdbc:sqlite:C:/db/emslabel.db"
+                        />
 
         <!-- 生成的包名和工程名 -->
         <javaModelGenerator targetPackage="com.skyfaith.domain"
@@ -26,7 +26,7 @@
                              targetProject="src/main/java" type="XMLMAPPER" />
 
         <!-- 数据库表 -->
-        <table catalog="EMSLabel" schema="dbo"  tableName="EMSOrder" domainObjectName="EmsOrder" escapeWildcards="true">
+        <table tableName="EMSOrder" domainObjectName="EmsOrder" escapeWildcards="true">
             <!-- 设置别名 -->
             <!--
             <columnOverride column="ds_id" property="dsId" />
