@@ -28,6 +28,7 @@
                     <items>
                         <MenuItem mnemonicParsing="false" onAction="#importOrderList" text="%ImportOrderList" />
                         <MenuItem mnemonicParsing="false" onAction="#importEorderList" text="%ImportEMSNo" />
+                        <MenuItem mnemonicParsing="false" onAction="#handleExportExcel" text="%ExportOrderList" />
                     </items>
                 </Menu>
                 <!--<Menu mnemonicParsing="false" text="Edit">-->
@@ -37,9 +38,9 @@
                 <!--</Menu>-->
                 <Menu mnemonicParsing="false" text="%Help">
                     <items>
-                        <!--<MenuItem mnemonicParsing="false" text="%English"/>-->
-                        <!--<MenuItem mnemonicParsing="false" text="%Chinese"/>-->
-                        <MenuItem mnemonicParsing="false" text="%About" />
+                        <MenuItem mnemonicParsing="false" onAction="#handleOutputOrderListTemplate" text="%OrderTemplate"/>
+                        <MenuItem mnemonicParsing="false" onAction="#handleOutputEOrderListTemplate" text="%EorderTemplate"/>
+                        <MenuItem mnemonicParsing="false" onAction="#handlAbout" text="%About" />
                     </items>
                 </Menu>
             </menus>
