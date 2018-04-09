@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.skyfaith.dao.EmsOrderMapper">
+  <resultMap id="BaseResultMap" type="com.skyfaith.domain.EmsOrder">
+    <id column="EorderNo" jdbcType="NVARCHAR" property="eorderno" />
+    <result column="OrderNo" jdbcType="NVARCHAR" property="orderno" />
+    <result column="Sender" jdbcType="NVARCHAR" property="sender" />
+    <result column="SenderPhone" jdbcType="NVARCHAR" property="senderphone" />
+    <result column="SenderAddress" jdbcType="NVARCHAR" property="senderaddress" />
+    <result column="Receiver" jdbcType="NVARCHAR" property="receiver" />
+    <result column="ReceiverPhone" jdbcType="NVARCHAR" property="receiverphone" />
+    <result column="ReceiverAddress" jdbcType="NVARCHAR" property="receiveraddress" />
+    <result column="BrandName" jdbcType="NVARCHAR" property="brandname" />
+    <result column="Weight" jdbcType="NVARCHAR" property="weight" />
+    <result column="DeclaredValue" jdbcType="DECIMAL" property="declaredvalue" />
+    <result column="PosttalCode" jdbcType="NVARCHAR" property="posttalcode" />
+    <result column="ClearancePort" jdbcType="NVARCHAR" property="clearanceport" />
+    <result column="SenderLand" jdbcType="NVARCHAR" property="senderland" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    EorderNo, OrderNo, Sender, SenderPhone, SenderAddress, Receiver, ReceiverPhone, ReceiverAddress, 
+    BrandName, Weight, DeclaredValue, PosttalCode, ClearancePort, SenderLand
+  </sql>
+  <select id="selectByExample" parameterType="com.skyfaith.domain.EmsOrderExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from EMSLabel.dbo.EMSOrder
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from EMSLabel.dbo.EMSOrder
+    where EorderNo = #{eorderno,jdbcType=NVARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from EMSLabel.dbo.EMSOrder
+    where EorderNo = #{eorderno,jdbcType=NVARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.skyfaith.domain.EmsOrderExample">
+    delete from EMSLabel.dbo.EMSOrder
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.skyfaith.domain.EmsOrder">
+    insert into EMSLabel.dbo.EMSOrder (EorderNo, OrderNo, Sender, 
+      SenderPhone, SenderAddress, Receiver, 
+      ReceiverPhone, ReceiverAddress, BrandName, 
+      Weight, DeclaredValue, PosttalCode, 
+      ClearancePort, SenderLand)
+    values (#{eorderno,jdbcType=NVARCHAR}, #{orderno,jdbcType=NVARCHAR}, #{sender,jdbcType=NVARCHAR}, 
+      #{senderphone,jdbcType=NVARCHAR}, #{senderaddress,jdbcType=NVARCHAR}, #{receiver,jdbcType=NVARCHAR}, 
+      #{receiverphone,jdbcType=NVARCHAR}, #{receiveraddress,jdbcType=NVARCHAR}, #{brandname,jdbcType=NVARCHAR}, 
+      #{weight,jdbcType=NVARCHAR}, #{declaredvalue,jdbcType=DECIMAL}, #{posttalcode,jdbcType=NVARCHAR}, 
+      #{clearanceport,jdbcType=NVARCHAR}, #{senderland,jdbcType=NVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.skyfaith.domain.EmsOrder">
+    insert into EMSLabel.dbo.EMSOrder
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="eorderno != null">
+        EorderNo,
+      </if>
+      <if test="orderno != null">
+        OrderNo,
+      </if>
+      <if test="sender != null">
+        Sender,
+      </if>
+      <if test="senderphone != null">
+        SenderPhone,
+      </if>
+      <if test="senderaddress != null">
+        SenderAddress,
+      </if>
+      <if test="receiver != null">
+        Receiver,
+      </if>
+      <if test="receiverphone != null">
+        ReceiverPhone,
+      </if>
+      <if test="receiveraddress != null">
+        ReceiverAddress,
+      </if>
+      <if test="brandname != null">
+        BrandName,
+      </if>
+      <if test="weight != null">
+        Weight,
+      </if>
+      <if test="declaredvalue != null">
+        DeclaredValue,
+      </if>
+      <if test="posttalcode != null">
+        PosttalCode,
+      </if>
+      <if test="clearanceport != null">
+        ClearancePort,
+      </if>
+      <if test="senderland != null">
+        SenderLand,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="eorderno != null">
+        #{eorderno,jdbcType=NVARCHAR},
+      </if>
+      <if test="orderno != null">
+        #{orderno,jdbcType=NVARCHAR},
+      </if>
+      <if test="sender != null">
+        #{sender,jdbcType=NVARCHAR},
+      </if>
+      <if test="senderphone != null">
+        #{senderphone,jdbcType=NVARCHAR},
+      </if>
+      <if test="senderaddress != null">
+        #{senderaddress,jdbcType=NVARCHAR},
+      </if>
+      <if test="receiver != null">
+        #{receiver,jdbcType=NVARCHAR},
+      </if>
+      <if test="receiverphone != null">
+        #{receiverphone,jdbcType=NVARCHAR},
+      </if>
+      <if test="receiveraddress != null">
+        #{receiveraddress,jdbcType=NVARCHAR},
+      </if>
+      <if test="brandname != null">
+        #{brandname,jdbcType=NVARCHAR},
+      </if>
+      <if test="weight != null">
+        #{weight,jdbcType=NVARCHAR},
+      </if>
+      <if test="declaredvalue != null">
+        #{declaredvalue,jdbcType=DECIMAL},
+      </if>
+      <if test="posttalcode != null">
+        #{posttalcode,jdbcType=NVARCHAR},
+      </if>
+      <if test="clearanceport != null">
+        #{clearanceport,jdbcType=NVARCHAR},
+      </if>
+      <if test="senderland != null">
+        #{senderland,jdbcType=NVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.skyfaith.domain.EmsOrderExample" resultType="java.lang.Long">
+    select count(*) from EMSLabel.dbo.EMSOrder
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update EMSLabel.dbo.EMSOrder
+    <set>
+      <if test="record.eorderno != null">
+        EorderNo = #{record.eorderno,jdbcType=NVARCHAR},
+      </if>
+      <if test="record.orderno != null">
+        OrderNo = #{record.orderno,jdbcType=NVARCHAR},
+      </if>
+      <if test="record.sender != null">
+        Sender = #{record.sender,jdbcType=NVARCHAR},
+      </if>
+      <if test="record.senderphone != null">
+        SenderPhone = #{record.senderphone,jdbcType=NVARCHAR},
+      </if>
+      <if test="record.senderaddress != null">
+        SenderAddress = #{record.senderaddress,jdbcType=NVARCHAR},
+      </if>
+      <if test="record.receiver != null">
+        Receiver = #{record.receiver,jdbcType=NVARCHAR},
+      </if>
+      <if test="record.receiverphone != null">
+        ReceiverPhone = #{record.receiverphone,jdbcType=NVARCHAR},
+      </if>
+      <if test="record.receiveraddress != null">
+        ReceiverAddress = #{record.receiveraddress,jdbcType=NVARCHAR},
+      </if>
+      <if test="record.brandname != null">
+        BrandName = #{record.brandname,jdbcType=NVARCHAR},
+      </if>
+      <if test="record.weight != null">
+        Weight = #{record.weight,jdbcType=NVARCHAR},
+      </if>
+      <if test="record.declaredvalue != null">
+        DeclaredValue = #{record.declaredvalue,jdbcType=DECIMAL},
+      </if>
+      <if test="record.posttalcode != null">
+        PosttalCode = #{record.posttalcode,jdbcType=NVARCHAR},
+      </if>
+      <if test="record.clearanceport != null">
+        ClearancePort = #{record.clearanceport,jdbcType=NVARCHAR},
+      </if>
+      <if test="record.senderland != null">
+        SenderLand = #{record.senderland,jdbcType=NVARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update EMSLabel.dbo.EMSOrder
+    set EorderNo = #{record.eorderno,jdbcType=NVARCHAR},
+      OrderNo = #{record.orderno,jdbcType=NVARCHAR},
+      Sender = #{record.sender,jdbcType=NVARCHAR},
+      SenderPhone = #{record.senderphone,jdbcType=NVARCHAR},
+      SenderAddress = #{record.senderaddress,jdbcType=NVARCHAR},
+      Receiver = #{record.receiver,jdbcType=NVARCHAR},
+      ReceiverPhone = #{record.receiverphone,jdbcType=NVARCHAR},
+      ReceiverAddress = #{record.receiveraddress,jdbcType=NVARCHAR},
+      BrandName = #{record.brandname,jdbcType=NVARCHAR},
+      Weight = #{record.weight,jdbcType=NVARCHAR},
+      DeclaredValue = #{record.declaredvalue,jdbcType=DECIMAL},
+      PosttalCode = #{record.posttalcode,jdbcType=NVARCHAR},
+      ClearancePort = #{record.clearanceport,jdbcType=NVARCHAR},
+      SenderLand = #{record.senderland,jdbcType=NVARCHAR}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.skyfaith.domain.EmsOrder">
+    update EMSLabel.dbo.EMSOrder
+    <set>
+      <if test="orderno != null">
+        OrderNo = #{orderno,jdbcType=NVARCHAR},
+      </if>
+      <if test="sender != null">
+        Sender = #{sender,jdbcType=NVARCHAR},
+      </if>
+      <if test="senderphone != null">
+        SenderPhone = #{senderphone,jdbcType=NVARCHAR},
+      </if>
+      <if test="senderaddress != null">
+        SenderAddress = #{senderaddress,jdbcType=NVARCHAR},
+      </if>
+      <if test="receiver != null">
+        Receiver = #{receiver,jdbcType=NVARCHAR},
+      </if>
+      <if test="receiverphone != null">
+        ReceiverPhone = #{receiverphone,jdbcType=NVARCHAR},
+      </if>
+      <if test="receiveraddress != null">
+        ReceiverAddress = #{receiveraddress,jdbcType=NVARCHAR},
+      </if>
+      <if test="brandname != null">
+        BrandName = #{brandname,jdbcType=NVARCHAR},
+      </if>
+      <if test="weight != null">
+        Weight = #{weight,jdbcType=NVARCHAR},
+      </if>
+      <if test="declaredvalue != null">
+        DeclaredValue = #{declaredvalue,jdbcType=DECIMAL},
+      </if>
+      <if test="posttalcode != null">
+        PosttalCode = #{posttalcode,jdbcType=NVARCHAR},
+      </if>
+      <if test="clearanceport != null">
+        ClearancePort = #{clearanceport,jdbcType=NVARCHAR},
+      </if>
+      <if test="senderland != null">
+        SenderLand = #{senderland,jdbcType=NVARCHAR},
+      </if>
+    </set>
+    where EorderNo = #{eorderno,jdbcType=NVARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.skyfaith.domain.EmsOrder">
+    update EMSLabel.dbo.EMSOrder
+    set OrderNo = #{orderno,jdbcType=NVARCHAR},
+      Sender = #{sender,jdbcType=NVARCHAR},
+      SenderPhone = #{senderphone,jdbcType=NVARCHAR},
+      SenderAddress = #{senderaddress,jdbcType=NVARCHAR},
+      Receiver = #{receiver,jdbcType=NVARCHAR},
+      ReceiverPhone = #{receiverphone,jdbcType=NVARCHAR},
+      ReceiverAddress = #{receiveraddress,jdbcType=NVARCHAR},
+      BrandName = #{brandname,jdbcType=NVARCHAR},
+      Weight = #{weight,jdbcType=NVARCHAR},
+      DeclaredValue = #{declaredvalue,jdbcType=DECIMAL},
+      PosttalCode = #{posttalcode,jdbcType=NVARCHAR},
+      ClearancePort = #{clearanceport,jdbcType=NVARCHAR},
+      SenderLand = #{senderland,jdbcType=NVARCHAR}
+    where EorderNo = #{eorderno,jdbcType=NVARCHAR}
+  </update>
+</mapper>

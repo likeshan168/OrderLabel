@@ -1,16 +1,10 @@
 package com.skyfaith;
 
-import com.skyfaith.controller.RootLayoutController;
 import com.skyfaith.view.MainStageView;
 import de.felixroske.jfxsupport.AbstractJavaFxApplicationSupport;
-import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
-import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-import java.io.IOException;
 
 /**
  * Hello world!
@@ -53,6 +47,7 @@ import java.io.IOException;
 //}
 
 @SpringBootApplication
+@MapperScan("com.skyfaith.dao")
 public class MainApp extends AbstractJavaFxApplicationSupport{
     public static void main(String[] args) {
         launchApp(MainApp.class, MainStageView.class, args);
@@ -60,5 +55,7 @@ public class MainApp extends AbstractJavaFxApplicationSupport{
     @Override
     public void start(Stage stage) throws Exception {
         super.start(stage);
+//        stage.setMaximized(true);
+        stage.setResizable(false);
     }
 }
