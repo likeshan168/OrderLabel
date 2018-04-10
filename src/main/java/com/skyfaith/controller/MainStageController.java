@@ -277,7 +277,7 @@ public class MainStageController implements Initializable {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("提示");
             alert.setHeaderText("错误信息");
-            alert.setContentText("导入清单列表失败");
+            alert.setContentText(String.format("导入清单列表失败:%s", e.getMessage()));
             alert.showAndWait();
             e.printStackTrace();
         }
@@ -317,31 +317,31 @@ public class MainStageController implements Initializable {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("消息");
             alert.setHeaderText("错误信息");
-            alert.setContentText("导入EMS订单异常");
+            alert.setContentText(String.format("导入EMS订单异常:%s", e.getMessage()));
             alert.showAndWait();
         }
     }
 
     @FXML
-    private void handleExportExcel(){
-        File file = saveFile("导出清单列表","订单列表.xlsx");
-        if(file != null){
+    private void handleExportExcel() {
+        File file = saveFile("导出清单列表", "订单列表.xlsx");
+        if (file != null) {
             exportExcel(file.getAbsolutePath());
         }
     }
 
     @FXML
-    private void handleOutputOrderListTemplate(){
+    private void handleOutputOrderListTemplate() {
         File file = saveFile("下载订单模板", "订单模板.xlsx");
-        if(file != null){
+        if (file != null) {
             exportOrderListTemplate(file.getAbsolutePath());
         }
     }
 
     @FXML
-    private void handleOutputEOrderListTemplate(){
-       File file = saveFile("下载EMS快递单号模板", "EMS快递单号模板.xlsx");
-        if(file != null){
+    private void handleOutputEOrderListTemplate() {
+        File file = saveFile("下载EMS快递单号模板", "EMS快递单号模板.xlsx");
+        if (file != null) {
             exportEOrderListTemplate(file.getAbsolutePath());
         }
     }
@@ -436,7 +436,7 @@ public class MainStageController implements Initializable {
         List<EmsOrder> orders = emsOrderService.getOrderList();
         for (int i = 0; i < orders.size(); i++) {
             EmsOrder order = orders.get(i);
-            XSSFRow datarow = sheet.createRow(i+1);
+            XSSFRow datarow = sheet.createRow(i + 1);
 
             XSSFCell datacell1 = datarow.createCell(0);
             datacell1.setCellType(CellType.STRING);
@@ -573,6 +573,7 @@ public class MainStageController implements Initializable {
 
         outputExcel(fileName);
     }
+
     private void exportEOrderListTemplate(String fileName) {
         // Declare a work sheet
         workbook = new XSSFWorkbook();
@@ -658,7 +659,7 @@ public class MainStageController implements Initializable {
     }
 
     @FXML
-    private void handlAbout(){
+    private void handlAbout() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("提示");
         alert.setHeaderText("软件简介");
