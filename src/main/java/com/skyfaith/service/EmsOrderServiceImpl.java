@@ -66,6 +66,17 @@ public class EmsOrderServiceImpl implements EmsOrderService {
     }
 
     @Override
+    public boolean updateOrder(EmsOrder order) {
+        try{
+            emsOrderDao.updateByPrimaryKey(order);
+            return true;
+        }catch (Exception e){
+            return false;
+        }
+
+    }
+
+    @Override
     public boolean updateEorderList(List<EmsOrder> emsOrders) {
         try {
             //判断EMS快递单号是否重复插入
@@ -104,5 +115,19 @@ public class EmsOrderServiceImpl implements EmsOrderService {
             return orders.get(0);
         }
         return null;
+    }
+
+    @Override
+    public boolean deleteDataByPrintDate(String printDate) {
+        try{
+            EmsOrderExample emsOrderExample = new EmsOrderExample();
+            EmsOrderExample.Criteria criteria = emsOrderExample.createCriteria();
+            criteria.andPrintdateLessThanOrEqualTo(printDate);
+            emsOrderDao.deleteByExample(emsOrderExample);
+            return true;
+        }catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
     }
 }

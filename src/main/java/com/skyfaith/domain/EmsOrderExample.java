@@ -1073,6 +1073,76 @@ public class EmsOrderExample {
             addCriterion("SenderLand not between", value1, value2, "senderland");
             return (Criteria) this;
         }
+
+        public Criteria andPrintdateIsNull() {
+            addCriterion("PrintDate is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPrintdateIsNotNull() {
+            addCriterion("PrintDate is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andPrintdateEqualTo(String value) {
+            addCriterion("PrintDate =", value, "printdate");
+            return (Criteria) this;
+        }
+
+        public Criteria andPrintdateNotEqualTo(String value) {
+            addCriterion("PrintDate <>", value, "printdate");
+            return (Criteria) this;
+        }
+
+        public Criteria andPrintdateGreaterThan(String value) {
+            addCriterion("PrintDate >", value, "printdate");
+            return (Criteria) this;
+        }
+
+        public Criteria andPrintdateGreaterThanOrEqualTo(String value) {
+            addCriterion("PrintDate >=", value, "printdate");
+            return (Criteria) this;
+        }
+
+        public Criteria andPrintdateLessThan(String value) {
+            addCriterion("PrintDate <", value, "printdate");
+            return (Criteria) this;
+        }
+
+        public Criteria andPrintdateLessThanOrEqualTo(String value) {
+            addCriterion("PrintDate <=", value, "printdate");
+            return (Criteria) this;
+        }
+
+        public Criteria andPrintdateLike(String value) {
+            addCriterion("PrintDate like", value, "printdate");
+            return (Criteria) this;
+        }
+
+        public Criteria andPrintdateNotLike(String value) {
+            addCriterion("PrintDate not like", value, "printdate");
+            return (Criteria) this;
+        }
+
+        public Criteria andPrintdateIn(List<String> values) {
+            addCriterion("PrintDate in", values, "printdate");
+            return (Criteria) this;
+        }
+
+        public Criteria andPrintdateNotIn(List<String> values) {
+            addCriterion("PrintDate not in", values, "printdate");
+            return (Criteria) this;
+        }
+
+        public Criteria andPrintdateBetween(String value1, String value2) {
+            addCriterion("PrintDate between", value1, value2, "printdate");
+            return (Criteria) this;
+        }
+
+        public Criteria andPrintdateNotBetween(String value1, String value2) {
+            addCriterion("PrintDate not between", value1, value2, "printdate");
+            return (Criteria) this;
+        }
     }
 
     public static class Criteria extends GeneratedCriteria {

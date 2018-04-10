@@ -16,6 +16,7 @@
     <result column="PosttalCode" jdbcType="VARCHAR" property="posttalcode" />
     <result column="ClearancePort" jdbcType="VARCHAR" property="clearanceport" />
     <result column="SenderLand" jdbcType="VARCHAR" property="senderland" />
+    <result column="PrintDate" jdbcType="VARCHAR" property="printdate" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -77,7 +78,7 @@
   </sql>
   <sql id="Base_Column_List">
     EorderNo, OrderNo, Sender, SenderPhone, SenderAddress, Receiver, ReceiverPhone, ReceiverAddress, 
-    BrandName, Weight, DeclaredValue, PosttalCode, ClearancePort, SenderLand
+    BrandName, Weight, DeclaredValue, PosttalCode, ClearancePort, SenderLand, PrintDate
   </sql>
   <select id="selectByExample" parameterType="com.skyfaith.domain.EmsOrderExample" resultMap="BaseResultMap">
     select
@@ -114,12 +115,14 @@
       SenderPhone, SenderAddress, Receiver, 
       ReceiverPhone, ReceiverAddress, BrandName, 
       Weight, DeclaredValue, PosttalCode, 
-      ClearancePort, SenderLand)
+      ClearancePort, SenderLand, PrintDate
+      )
     values (#{eorderno,jdbcType=VARCHAR}, #{orderno,jdbcType=VARCHAR}, #{sender,jdbcType=VARCHAR}, 
       #{senderphone,jdbcType=VARCHAR}, #{senderaddress,jdbcType=VARCHAR}, #{receiver,jdbcType=VARCHAR}, 
       #{receiverphone,jdbcType=VARCHAR}, #{receiveraddress,jdbcType=VARCHAR}, #{brandname,jdbcType=VARCHAR}, 
       #{weight,jdbcType=VARCHAR}, #{declaredvalue,jdbcType=FLOAT}, #{posttalcode,jdbcType=VARCHAR}, 
-      #{clearanceport,jdbcType=VARCHAR}, #{senderland,jdbcType=VARCHAR})
+      #{clearanceport,jdbcType=VARCHAR}, #{senderland,jdbcType=VARCHAR}, #{printdate,jdbcType=VARCHAR}
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.skyfaith.domain.EmsOrder">
     insert into EMSOrder
@@ -166,6 +169,9 @@
       <if test="senderland != null">
         SenderLand,
       </if>
+      <if test="printdate != null">
+        PrintDate,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="eorderno != null">
@@ -209,6 +215,9 @@
       </if>
       <if test="senderland != null">
         #{senderland,jdbcType=VARCHAR},
+      </if>
+      <if test="printdate != null">
+        #{printdate,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -263,6 +272,9 @@
       <if test="record.senderland != null">
         SenderLand = #{record.senderland,jdbcType=VARCHAR},
       </if>
+      <if test="record.printdate != null">
+        PrintDate = #{record.printdate,jdbcType=VARCHAR},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -283,7 +295,8 @@
       DeclaredValue = #{record.declaredvalue,jdbcType=FLOAT},
       PosttalCode = #{record.posttalcode,jdbcType=VARCHAR},
       ClearancePort = #{record.clearanceport,jdbcType=VARCHAR},
-      SenderLand = #{record.senderland,jdbcType=VARCHAR}
+      SenderLand = #{record.senderland,jdbcType=VARCHAR},
+      PrintDate = #{record.printdate,jdbcType=VARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -330,6 +343,9 @@
       <if test="senderland != null">
         SenderLand = #{senderland,jdbcType=VARCHAR},
       </if>
+      <if test="printdate != null">
+        PrintDate = #{printdate,jdbcType=VARCHAR},
+      </if>
     </set>
     where EorderNo = #{eorderno,jdbcType=VARCHAR}
   </update>
@@ -347,7 +363,8 @@
       DeclaredValue = #{declaredvalue,jdbcType=FLOAT},
       PosttalCode = #{posttalcode,jdbcType=VARCHAR},
       ClearancePort = #{clearanceport,jdbcType=VARCHAR},
-      SenderLand = #{senderland,jdbcType=VARCHAR}
+      SenderLand = #{senderland,jdbcType=VARCHAR},
+      PrintDate = #{printdate,jdbcType=VARCHAR}
     where EorderNo = #{eorderno,jdbcType=VARCHAR}
   </update>
 </mapper>

@@ -4,6 +4,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 public class EmsOrder {
     private StringProperty eorderno;
@@ -33,6 +34,8 @@ public class EmsOrder {
     private StringProperty clearanceport;
 
     private StringProperty senderland;
+
+    private String printdate;
 
     public EmsOrder(){
         this.eorderno = new SimpleStringProperty();
@@ -213,5 +216,12 @@ public class EmsOrder {
 
     public void setSenderland(String senderland) {
         this.senderland.set(senderland);
+    }
+    public String getPrintdate() {
+        return printdate;
+    }
+
+    public void setPrintdate(String printdate) {
+        this.printdate = printdate;
     }
 }

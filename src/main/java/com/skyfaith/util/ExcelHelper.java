@@ -7,13 +7,10 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.apache.poi.ss.usermodel.CellType.*;
 
 public class ExcelHelper {
     public static List<EmsOrder> ImportEmsOrderInfo1(String xlsPath) throws Exception {
