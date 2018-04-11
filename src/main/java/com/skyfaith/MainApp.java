@@ -99,7 +99,8 @@ public class MainApp extends AbstractJavaFxApplicationSupport{
                             "  DeclaredValue   decimal(19, 5),\n" +
                             "  PosttalCode     nvarchar(6),\n" +
                             "  ClearancePort   nvarchar(100),\n" +
-                            "  SenderLand      nvarchar(100)\n" +
+                            "  SenderLand      nvarchar(100),\n" +
+                            "  PrintDate       datetime"+
                             ");");
                 }
             }

@@ -192,7 +192,7 @@
                                 <Label text="可用EMS单号数量：" />
                                 <Label fx:id="avaliableEmsOrderCount" text="0" />
                                 <Button onAction="#deleteData" prefWidth="100" text="删除数据" />
-                                <DatePicker fx:id="datePicker" promptText="删除某个时间之前的数据"/>
+                                <DatePicker fx:id="datePicker" promptText="选择时间"/>
                             </HBox>
                             <HBox alignment="CENTER_LEFT" spacing="5" AnchorPane.leftAnchor="5.0">
                                 <children>

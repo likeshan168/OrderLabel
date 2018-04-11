@@ -2,6 +2,7 @@ package com.skyfaith.controller;
 
 import com.skyfaith.MainApp;
 import com.skyfaith.domain.EmsOrder;
+import com.skyfaith.domain.EmsOrderExample;
 import com.skyfaith.service.EmsOrderService;
 import com.skyfaith.util.BarCodeUtils;
 import com.skyfaith.util.ExcelHelper;
@@ -296,6 +297,10 @@ public class MainStageController implements Initializable {
 
     @FXML
     private void handleExportExcel() {
+        if(datePicker.getValue()==null){
+            showMessageDialog(Alert.AlertType.ERROR,"提示","时间未选择", String.format("请选择导出订单列表的日期"));
+            return;
+        }
         File file = saveFile("导出清单列表", "订单列表.xlsx");
         if (file != null) {
             exportExcel(file.getAbsolutePath());
@@ -404,8 +409,16 @@ public class MainStageController implements Initializable {
         XSSFCell cell14 = row.createCell(13);
         cell14.setCellType(CellType.NUMERIC);
         cell14.setCellValue(new XSSFRichTextString("快递单号"));
+        XSSFCell cell15 = row.createCell(14);
+        cell15.setCellType(CellType.NUMERIC);
+        cell15.setCellValue(new XSSFRichTextString("打单日期"));
 
-        List<EmsOrder> orders = emsOrderService.getOrderList();
+        DateTimeFormatter ft = DateTimeFormatter.ofPattern(pattern);
+        EmsOrderExample emsOrderExample = new EmsOrderExample();
+        EmsOrderExample.Criteria criteria = emsOrderExample.createCriteria();
+        criteria.andPrintdateGreaterThanOrEqualTo(ft.format(datePicker.getValue()));
+        emsOrderExample.getOredCriteria().add(criteria);
+        List<EmsOrder> orders = emsOrderService.getOrderList(emsOrderExample);
         for (int i = 0; i < orders.size(); i++) {
             EmsOrder order = orders.get(i);
             XSSFRow datarow = sheet.createRow(i + 1);
@@ -465,6 +478,10 @@ public class MainStageController implements Initializable {
             XSSFCell datacell14 = datarow.createCell(13);
             datacell14.setCellType(CellType.STRING);
             datacell14.setCellValue(order.getClearanceport());
+
+            XSSFCell datacell15 = datarow.createCell(14);
+            datacell15.setCellType(CellType.STRING);
+            datacell15.setCellValue(order.getPrintdate());
         }
 
         outputExcel(fileName);

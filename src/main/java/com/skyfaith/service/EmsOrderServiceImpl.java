@@ -24,6 +24,11 @@ public class EmsOrderServiceImpl implements EmsOrderService {
     }
 
     @Override
+    public List<EmsOrder> getOrderList(EmsOrderExample emsOrderExample) {
+        return emsOrderDao.selectByExample(emsOrderExample);
+    }
+
+    @Override
     public boolean updateOrderList(List<EmsOrder> orders) {
         try {
             //获取EMS单号信息
