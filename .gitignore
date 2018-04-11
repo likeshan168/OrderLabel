@@ -1,3 +1,7 @@
 # Created by .ignore support plugin (hsz.mobi)
 .idea
 target
+/bin/
+/.classpath
+/.project
+/.gitignore.swp

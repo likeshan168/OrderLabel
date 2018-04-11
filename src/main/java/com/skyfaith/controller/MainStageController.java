@@ -6,16 +6,21 @@ import com.skyfaith.domain.EmsOrderExample;
 import com.skyfaith.service.EmsOrderService;
 import com.skyfaith.util.BarCodeUtils;
 import com.skyfaith.util.ExcelHelper;
+import com.sun.javafx.print.Units;
 import de.felixroske.jfxsupport.FXMLController;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.print.*;
+import javafx.scene.Group;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.transform.Scale;
 import javafx.stage.FileChooser;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.BorderStyle;
@@ -114,9 +119,14 @@ public class MainStageController implements Initializable {
     private Label avaliableEmsOrderCount;
 
     @FXML
-    private Pane emsLabel;
+    private Group emsLabel;
+    @FXML
+    private Pane gridPane;
     @FXML
     private DatePicker datePicker;
+    
+    @FXML
+    private AnchorPane acpane;
 
 
     public void initialize(URL location, ResourceBundle resources) {
@@ -611,25 +621,45 @@ public class MainStageController implements Initializable {
 
     @FXML
     private void printPage() {
-        System.out.println("............开始打印..............");
         Printer printer = Printer.getDefaultPrinter();
-        //设置打印纸张和打印样式（PageOrientation.LANDSCAPE：横版打印）
-        PageLayout paper = printer.getDefaultPageLayout();
-//        PageLayout paper = printer.createPageLayout(Paper.A4, PageOrientation.LANDSCAPE, Printer.MarginType.DEFAULT);
+        PageLayout paper = printer.createPageLayout(Paper.JAPANESE_POSTCARD, PageOrientation.PORTRAIT, 0,0,0,0);
         //创建打印任务
         PrinterJob job = PrinterJob.createPrinterJob();
         JobSettings jobSetting = null;
         if (job != null) {
 //            //调取打印页面
-//            Scene scene = new Scene(createContent3());
+//            Scene scene = new Scene(emsLabel);
 //            //加载打印页面CSS样式
-//            scene.getStylesheets().add(getClass().getResource("application_print.css").toExternalForm());
+//            scene.getStylesheets().add(getClass().getResource("/css/MainStage.css").toExternalForm());
             jobSetting = job.getJobSettings();
             jobSetting.setCopies(1);   //设置一次打印张数
-            job.printPage(paper, emsLabel);
-            // job.printPage(createContent3());
-            // job.printPage(getTableView());
-            job.endJob();
+//            Pane p = new Pane();
+//            p.getChildren().addAll(emsLabel.getChildrenUnmodifiable());
+//            p.setPrefWidth(emsLabel.getPrefWidth());
+//            p.setPrefHeight(emsLabel.getPrefHeight());
+//            gridPane.setManaged(false);
+//            emsLabel.setVisible(true);
+            double width = gridPane.getPrefWidth();
+            double height = gridPane.getPrefHeight();
+            PrintResolution resolution = job.getJobSettings().getPrintResolution();
+            width /= resolution.getFeedResolution();
+            height /= resolution.getCrossFeedResolution();
+            double scaleX = paper.getPrintableWidth()/width/600;
+            double scaleY = paper.getPrintableHeight()/height/600;
+            Scale scale = new Scale(scaleX, scaleY);
+            emsLabel.getTransforms().add(scale);
+            
+//            AnchorPane.setLeftAnchor(gridPane, 0d);
+//            AnchorPane.setTopAnchor(gridPane, 0d);
+            if(job.printPage(paper, emsLabel)){
+                job.endJob();
+            }
+            
+            emsLabel.getTransforms().remove(scale);
+//            AnchorPane.setLeftAnchor(gridPane, 5d);
+//            AnchorPane.setTopAnchor(gridPane, 60d);
+//            emsLabel.setVisible(true);
+
         } else {
             showMessageDialog(Alert.AlertType.ERROR,"提示","错误信息", "创建打印任务失败");
         }

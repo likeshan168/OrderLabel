@@ -1,12 +1,16 @@
 #mainBorderPane {
-    -fx-pref-height: 660.0;
+    -fx-pref-height: 680.0;
     -fx-pref-width: 900.0;
 }
 
+#pane{
+    -fx-pref-height: 150mm;
+    -fx-pref-width: 100mm;
+}
+
 .printPage{
-    -fx-pref-height: 15cm;
-    -fx-pref-width:10cm;
-    -fx-border-width: 1;
+    -fx-pref-height: 150mm;
+    -fx-pref-width: 100mm;
     /*-fx-grid-lines-visible: true;*/
     /*-fx-horizontal-grid-lines-visible: true;*/
 }
