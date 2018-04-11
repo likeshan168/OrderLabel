@@ -477,7 +477,7 @@ public class MainStageController implements Initializable {
 
             XSSFCell datacell14 = datarow.createCell(13);
             datacell14.setCellType(CellType.STRING);
-            datacell14.setCellValue(order.getClearanceport());
+            datacell14.setCellValue(order.getEorderno());
 
             XSSFCell datacell15 = datarow.createCell(14);
             datacell15.setCellType(CellType.STRING);
