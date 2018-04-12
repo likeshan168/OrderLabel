@@ -633,32 +633,22 @@ public class MainStageController implements Initializable {
 //            scene.getStylesheets().add(getClass().getResource("/css/MainStage.css").toExternalForm());
             jobSetting = job.getJobSettings();
             jobSetting.setCopies(1);   //设置一次打印张数
-//            Pane p = new Pane();
-//            p.getChildren().addAll(emsLabel.getChildrenUnmodifiable());
-//            p.setPrefWidth(emsLabel.getPrefWidth());
-//            p.setPrefHeight(emsLabel.getPrefHeight());
-//            gridPane.setManaged(false);
-//            emsLabel.setVisible(true);
+
             double width = gridPane.getPrefWidth();
             double height = gridPane.getPrefHeight();
             PrintResolution resolution = job.getJobSettings().getPrintResolution();
             width /= resolution.getFeedResolution();
             height /= resolution.getCrossFeedResolution();
-            double scaleX = paper.getPrintableWidth()/width/600;
-            double scaleY = paper.getPrintableHeight()/height/600;
+            double scaleX = paper.getPrintableWidth()/width/resolution.getFeedResolution();
+            double scaleY = paper.getPrintableHeight()/height/resolution.getFeedResolution();
             Scale scale = new Scale(scaleX, scaleY);
             emsLabel.getTransforms().add(scale);
-            
-//            AnchorPane.setLeftAnchor(gridPane, 0d);
-//            AnchorPane.setTopAnchor(gridPane, 0d);
+
             if(job.printPage(paper, emsLabel)){
                 job.endJob();
             }
             
             emsLabel.getTransforms().remove(scale);
-//            AnchorPane.setLeftAnchor(gridPane, 5d);
-//            AnchorPane.setTopAnchor(gridPane, 60d);
-//            emsLabel.setVisible(true);
 
         } else {
             showMessageDialog(Alert.AlertType.ERROR,"提示","错误信息", "创建打印任务失败");
