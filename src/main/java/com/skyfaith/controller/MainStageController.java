@@ -10,18 +10,27 @@ import com.sun.javafx.print.Units;
 import de.felixroske.jfxsupport.FXMLController;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.print.*;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.transform.Scale;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.CellType;
@@ -30,6 +39,7 @@ import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.xssf.usermodel.*;
 
 import javax.annotation.Resource;
+import javax.imageio.ImageIO;
 import javax.swing.text.DateFormatter;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -39,6 +49,7 @@ import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 @FXMLController
@@ -124,9 +135,12 @@ public class MainStageController implements Initializable {
     private Pane gridPane;
     @FXML
     private DatePicker datePicker;
-    
+
     @FXML
     private AnchorPane acpane;
+
+    @FXML
+    private ProgressBar progressBar;
 
 
     public void initialize(URL location, ResourceBundle resources) {
@@ -154,17 +168,11 @@ public class MainStageController implements Initializable {
             return;
         }
 
-        if (customeCodeField.getText().isEmpty()) {
-            showMessageDialog(Alert.AlertType.ERROR,"提示","错误信息", "验视的内容不能为空！");
-            return;
-        } else if (yanshiField.getText().isEmpty()) {
-            showMessageDialog(Alert.AlertType.ERROR,"提示","错误信息", "验视的内容不能为空！");
-            return;
-        }
+        if (!checkRequiredField()) return;
         //搜索
         EmsOrder order = emsOrderService.searchEmsOrderByOrderNo(this.orderNoField.getText());
         if (order == null) {
-            showMessageDialog(Alert.AlertType.INFORMATION,"提示","提示信息", "没有找到该订单信息");
+            showMessageDialog(Alert.AlertType.INFORMATION, "提示", "提示信息", "没有找到该订单信息");
         } else {
             orders.clear();
             orders.add(order);
@@ -268,15 +276,92 @@ public class MainStageController implements Initializable {
                     avaliableEmsOrderCount.setText(String.valueOf(emsOrderService.getAvaliableEmsOrderCount()));
                     orders.clear();
                     orders.addAll(emsOrderService.getOrderList());
-                    showMessageDialog(Alert.AlertType.INFORMATION,"提示","提示信息", "导入清单列表成功");
+                    showMessageDialog(Alert.AlertType.INFORMATION, "提示", "提示信息", "导入清单列表成功");
                 } else {
-                    showMessageDialog(Alert.AlertType.ERROR,"提示","错误信息", "导入清单列表失败, 请查看是否有足够的EMS的快递单号");
+                    showMessageDialog(Alert.AlertType.ERROR, "提示", "错误信息", "导入清单列表失败, 请查看是否有足够的EMS的快递单号");
                 }
             }
         } catch (Exception e) {
-            showMessageDialog(Alert.AlertType.ERROR,"提示","错误信息", String.format("导入清单列表失败:%s", e.getMessage()));
+            showMessageDialog(Alert.AlertType.ERROR, "提示", "错误信息", String.format("导入清单列表失败:%s", e.getMessage()));
         }
 
+    }
+
+    @FXML
+    private void importOrderListAndExportPdf() {
+        try {
+            if (!checkRequiredField()) return;
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("导入清单列表");
+            FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
+                    "Excel files (*.xls|*.xlsx)", "*.xls", "*.xlsx");
+
+            fileChooser.getExtensionFilters().add(extFilter);
+
+            File file = fileChooser.showOpenDialog(MainApp.getStage());
+
+            if (file != null) {
+                List<EmsOrder> list = ExcelHelper.ImportEmsOrderInfo1(file.getPath());
+                if (emsOrderService.updateOrderList(list)) {
+                    avaliableEmsOrderCount.setText(String.valueOf(emsOrderService.getAvaliableEmsOrderCount()));
+                    orders.clear();
+                    orders.addAll(emsOrderService.getOrderList());
+                    //导出pdf
+                    ExportPDF(list);
+                    showMessageDialog(Alert.AlertType.INFORMATION, "提示", "提示信息", "导入清单列表成功");
+                } else {
+                    showMessageDialog(Alert.AlertType.ERROR, "提示", "错误信息", "导入清单列表失败, 请查看是否有足够的EMS的快递单号");
+                }
+            }
+        } catch (Exception e) {
+            showMessageDialog(Alert.AlertType.ERROR, "提示", "错误信息", String.format("导入清单列表失败:%s", e.getMessage()));
+        }
+
+    }
+
+    //导出数据到pdf
+    private void ExportPDF(List<EmsOrder> orders) {
+        PDDocument doc = new PDDocument();
+        PDPage page;
+        PDImageXObject pdimage;
+        PDPageContentStream content;
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        directoryChooser.setTitle("选择导出pdf的文件夹路径");
+        File chosenDir  = directoryChooser.showDialog(MainApp.getStage());
+        if (chosenDir!=null){
+            try {
+                String path = chosenDir.getAbsolutePath();
+
+                for (EmsOrder order: orders){
+                    page = new PDPage();
+                    showEMSLabel(order);
+                    WritableImage nodeshot = emsLabel.snapshot(new SnapshotParameters(), null);
+                    File file = new File(path +String.format("\\%s.png",order.getOrderno()));
+                    ImageIO.write(SwingFXUtils.fromFXImage(nodeshot, null), "png", file);
+                    pdimage = PDImageXObject.createFromFileByExtension(file, doc);
+                    content = new PDPageContentStream(doc, page);
+                    content.drawImage(pdimage, 0, 220);
+                    content.close();
+                    doc.addPage(page);
+                }
+
+                doc.save(String.format("%s\\pdf_file.pdf", path));
+                doc.close();
+            } catch (IOException ex) {
+                showMessageDialog(Alert.AlertType.ERROR, "提示", "错误信息", String.format("导出pdf异常:%s", ex.getMessage()));
+            }
+        }
+    }
+
+    private boolean checkRequiredField() {
+        if (customeCodeField.getText().isEmpty()) {
+            showMessageDialog(Alert.AlertType.ERROR, "提示", "错误信息", "客户的编号不能为空！");
+            return false;
+        } else if (yanshiField.getText().isEmpty()) {
+            showMessageDialog(Alert.AlertType.ERROR, "提示", "错误信息", "验视的内容不能为空！");
+            return false;
+        }
+        return true;
     }
 
     @FXML
@@ -295,20 +380,20 @@ public class MainStageController implements Initializable {
                 List<EmsOrder> list = ExcelHelper.ImportEmsOrderInfo2(file.getPath());
                 if (emsOrderService.updateEorderList(list)) {
                     avaliableEmsOrderCount.setText(String.valueOf(emsOrderService.getAvaliableEmsOrderCount()));
-                    showMessageDialog(Alert.AlertType.INFORMATION,"提示","提示信息", "导入EMS订单成功");
+                    showMessageDialog(Alert.AlertType.INFORMATION, "提示", "提示信息", "导入EMS订单成功");
                 } else {
-                    showMessageDialog(Alert.AlertType.ERROR,"提示","错误信息", "导入EMS订单失败");
+                    showMessageDialog(Alert.AlertType.ERROR, "提示", "错误信息", "导入EMS订单失败");
                 }
             }
         } catch (Exception e) {
-            showMessageDialog(Alert.AlertType.ERROR,"提示","错误信息", String.format("导入EMS订单异常:%s", e.getMessage()));
+            showMessageDialog(Alert.AlertType.ERROR, "提示", "错误信息", String.format("导入EMS订单异常:%s", e.getMessage()));
         }
     }
 
     @FXML
     private void handleExportExcel() {
-        if(datePicker.getValue()==null){
-            showMessageDialog(Alert.AlertType.ERROR,"提示","时间未选择", String.format("请选择导出订单列表的日期"));
+        if (datePicker.getValue() == null) {
+            showMessageDialog(Alert.AlertType.ERROR, "提示", "时间未选择", String.format("请选择导出订单列表的日期"));
             return;
         }
         File file = saveFile("导出清单列表", "订单列表.xlsx");
@@ -612,17 +697,17 @@ public class MainStageController implements Initializable {
             fos = new FileOutputStream(new File(fileName));
             workbook.write(fos);
             fos.close();
-            showMessageDialog(Alert.AlertType.INFORMATION,"提示","成功信息", "保存成功");
+            showMessageDialog(Alert.AlertType.INFORMATION, "提示", "成功信息", "保存成功");
         } catch (IOException e) {
             e.printStackTrace();
-            showMessageDialog(Alert.AlertType.ERROR,"提示","错误信息", "保存失败");
+            showMessageDialog(Alert.AlertType.ERROR, "提示", "错误信息", "保存失败");
         }
     }
 
     @FXML
     private void printPage() {
         Printer printer = Printer.getDefaultPrinter();
-        PageLayout paper = printer.createPageLayout(Paper.JAPANESE_POSTCARD, PageOrientation.PORTRAIT, 0,0,0,0);
+        PageLayout paper = printer.createPageLayout(Paper.JAPANESE_POSTCARD, PageOrientation.PORTRAIT, 0, 0, 0, 0);
         //创建打印任务
         PrinterJob job = PrinterJob.createPrinterJob();
         JobSettings jobSetting = null;
@@ -639,19 +724,19 @@ public class MainStageController implements Initializable {
             PrintResolution resolution = job.getJobSettings().getPrintResolution();
             width /= resolution.getFeedResolution();
             height /= resolution.getCrossFeedResolution();
-            double scaleX = paper.getPrintableWidth()/width/resolution.getFeedResolution();
-            double scaleY = paper.getPrintableHeight()/height/resolution.getFeedResolution();
+            double scaleX = paper.getPrintableWidth() / width / resolution.getFeedResolution();
+            double scaleY = paper.getPrintableHeight() / height / resolution.getFeedResolution();
             Scale scale = new Scale(scaleX, scaleY);
             emsLabel.getTransforms().add(scale);
 
-            if(job.printPage(paper, emsLabel)){
+            if (job.printPage(paper, emsLabel)) {
                 job.endJob();
             }
-            
+
             emsLabel.getTransforms().remove(scale);
 
         } else {
-            showMessageDialog(Alert.AlertType.ERROR,"提示","错误信息", "创建打印任务失败");
+            showMessageDialog(Alert.AlertType.ERROR, "提示", "错误信息", "创建打印任务失败");
         }
     }
 
@@ -662,16 +747,15 @@ public class MainStageController implements Initializable {
                 DateTimeFormatter dateFormatter =
                         DateTimeFormatter.ofPattern(pattern);
                 if (emsOrderService.deleteDataByPrintDate(dateFormatter.format(datePicker.getValue()))) {
-                    showMessageDialog(Alert.AlertType.INFORMATION,"提示","提示信息", "删除成功");
+                    showMessageDialog(Alert.AlertType.INFORMATION, "提示", "提示信息", "删除成功");
                     //从新获取数据
-                    orders.clear();
-                    orders.addAll(emsOrderService.getOrderList());
+                    refresh();
                 }
             } else {
-                showMessageDialog(Alert.AlertType.ERROR,"提示","时间为必填项", "请选择要时间，删除指定时间之前的数据");
+                showMessageDialog(Alert.AlertType.ERROR, "提示", "时间为必填项", "请选择要时间，删除指定时间之前的数据");
             }
         } catch (Exception e) {
-            showMessageDialog(Alert.AlertType.ERROR,"提示","错误信息", String.format("删除数据失败：%s", e.getMessage()));
+            showMessageDialog(Alert.AlertType.ERROR, "提示", "错误信息", String.format("删除数据失败：%s", e.getMessage()));
         }
 
     }
@@ -685,11 +769,72 @@ public class MainStageController implements Initializable {
         alert.showAndWait();
     }
 
-    private void showMessageDialog(Alert.AlertType alertType, String title, String headerContent, String content){
+    @FXML
+    private void refresh(){
+        orders.clear();
+        orders.addAll(emsOrderService.getOrderList());
+    }
+
+    @FXML
+    private void clearAll(){
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("警告");
+        alert.setHeaderText("清空所有数据？");
+        alert.setContentText("确认清空所有的数据吗，不可恢复");
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get()==ButtonType.OK){
+           if( emsOrderService.clearAllData()){
+               refresh();
+               showMessageDialog(Alert.AlertType.INFORMATION,"提示", "", "数据已经清空");
+           }else{
+               showMessageDialog(Alert.AlertType.ERROR,"错误", "", "删除数据失败");
+           }
+        }
+    }
+
+    private void showMessageDialog(Alert.AlertType alertType, String title, String headerContent, String content) {
         Alert alert = new Alert(alertType);
         alert.setTitle(title);
         alert.setHeaderText(headerContent);
         alert.setContentText(content);
         alert.showAndWait();
     }
+
+    //暂时不能用
+    Service<Integer> service = new Service<Integer>() {
+        @Override
+        protected Task<Integer> createTask() {
+            return new Task<Integer>() {
+
+                @Override
+                protected Integer call() throws Exception {
+                    try {
+                        FileChooser fileChooser = new FileChooser();
+                        fileChooser.setTitle("导入Ems快递单号");
+                        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
+                                "Excel files (*.xls|*.xlsx)", "*.xls", "*.xlsx");
+
+                        fileChooser.getExtensionFilters().add(extFilter);
+
+                        File file = fileChooser.showOpenDialog(MainApp.getStage());
+
+                        if (file != null) {
+                            updateProgress(50,100);
+                            List<EmsOrder> list = ExcelHelper.ImportEmsOrderInfo2(file.getPath());
+                            if (emsOrderService.updateEorderList(list)) {
+                                avaliableEmsOrderCount.setText(String.valueOf(emsOrderService.getAvaliableEmsOrderCount()));
+                                showMessageDialog(Alert.AlertType.INFORMATION, "提示", "提示信息", "导入EMS订单成功");
+                            } else {
+                                showMessageDialog(Alert.AlertType.ERROR, "提示", "错误信息", "导入EMS订单失败");
+                            }
+                        }
+                    } catch (Exception e) {
+                        showMessageDialog(Alert.AlertType.ERROR, "提示", "错误信息", String.format("导入EMS订单异常:%s", e.getMessage()));
+                    }
+                    return null;
+                };
+            };
+        }
+    };
+
 }

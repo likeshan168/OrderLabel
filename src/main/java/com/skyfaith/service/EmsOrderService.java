@@ -14,4 +14,5 @@ public interface EmsOrderService {
     long getAvaliableEmsOrderCount();
     EmsOrder searchEmsOrderByOrderNo(String orderNo);
     boolean deleteDataByPrintDate(String printDate);
+    boolean clearAllData();
 }

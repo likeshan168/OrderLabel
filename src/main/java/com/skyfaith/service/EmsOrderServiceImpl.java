@@ -135,4 +135,15 @@ public class EmsOrderServiceImpl implements EmsOrderService {
             return false;
         }
     }
+
+    @Override
+    public boolean clearAllData() {
+        try{
+            emsOrderDao.deleteByExample(null);
+            return true;
+        }catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
+    }
 }
