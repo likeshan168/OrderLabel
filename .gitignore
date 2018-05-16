@@ -5,3 +5,4 @@ target
 /.classpath
 /.project
 /.gitignore.swp
+/pom.xml

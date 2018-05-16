@@ -8,6 +8,7 @@ import com.skyfaith.util.BarCodeUtils;
 import com.skyfaith.util.ExcelHelper;
 import com.sun.javafx.print.Units;
 import de.felixroske.jfxsupport.FXMLController;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
@@ -141,6 +142,9 @@ public class MainStageController implements Initializable {
 
     @FXML
     private ProgressBar progressBar;
+
+    @FXML
+    private Label printMsg;
 
 
     public void initialize(URL location, ResourceBundle resources) {
@@ -288,7 +292,7 @@ public class MainStageController implements Initializable {
     }
 
     @FXML
-    private void importOrderListAndExportPdf() {
+    private void importOrderListAndBatchPrint() {
         try {
             if (!checkRequiredField()) return;
             FileChooser fileChooser = new FileChooser();
@@ -301,17 +305,43 @@ public class MainStageController implements Initializable {
             File file = fileChooser.showOpenDialog(MainApp.getStage());
 
             if (file != null) {
-                List<EmsOrder> list = ExcelHelper.ImportEmsOrderInfo1(file.getPath());
-                if (emsOrderService.updateOrderList(list)) {
-                    avaliableEmsOrderCount.setText(String.valueOf(emsOrderService.getAvaliableEmsOrderCount()));
-                    orders.clear();
-                    orders.addAll(emsOrderService.getOrderList());
-                    //导出pdf
-                    ExportPDF(list);
-                    showMessageDialog(Alert.AlertType.INFORMATION, "提示", "提示信息", "导入清单列表成功");
-                } else {
-                    showMessageDialog(Alert.AlertType.ERROR, "提示", "错误信息", "导入清单列表失败, 请查看是否有足够的EMS的快递单号");
-                }
+                Task<Void> batchPrintTask = new Task<Void>() {
+                    @Override
+                    protected Void call() throws Exception {
+                        Platform.runLater(() -> {
+                            try {
+                                updateMessage("正在读取数据...");
+                                List<EmsOrder> list = ExcelHelper.ImportEmsOrderInfo1(file.getPath());
+                                updateMessage("正在导入数据...");
+                                if (emsOrderService.updateOrderList(list)) {
+                                    avaliableEmsOrderCount.setText(String.valueOf(emsOrderService.getAvaliableEmsOrderCount()));
+                                    orders.clear();
+                                    orders.addAll(emsOrderService.getOrderList());
+                                    //批量打印
+                                    updateMessage("正在打印标签...");
+                                    BatchPrint(list);
+                                } else {
+                                    updateMessage("导入清单列表失败, 请查看是否有足够的EMS的快递单号");
+                                }
+                            } catch (Exception e) {
+                                updateMessage(e.getMessage());
+                            }
+                        });
+
+                        return null;
+                    }
+                };
+
+                printMsg.textProperty().bind(batchPrintTask.messageProperty());
+                batchPrintTask.setOnSucceeded(e -> {
+                    printMsg.textProperty().unbind();
+                    printMsg.setText("批量打印完成...");
+                });
+
+                Thread thread = new Thread(batchPrintTask);
+                thread.setDaemon(true);
+                thread.start();
+
             }
         } catch (Exception e) {
             showMessageDialog(Alert.AlertType.ERROR, "提示", "错误信息", String.format("导入清单列表失败:%s", e.getMessage()));
@@ -319,7 +349,7 @@ public class MainStageController implements Initializable {
 
     }
 
-    //导出数据到pdf
+    //导出数据到pdf （暂时不用）
     private void ExportPDF(List<EmsOrder> orders) {
         PDDocument doc = new PDDocument();
         PDPage page;
@@ -327,16 +357,16 @@ public class MainStageController implements Initializable {
         PDPageContentStream content;
         DirectoryChooser directoryChooser = new DirectoryChooser();
         directoryChooser.setTitle("选择导出pdf的文件夹路径");
-        File chosenDir  = directoryChooser.showDialog(MainApp.getStage());
-        if (chosenDir!=null){
+        File chosenDir = directoryChooser.showDialog(MainApp.getStage());
+        if (chosenDir != null) {
             try {
                 String path = chosenDir.getAbsolutePath();
 
-                for (EmsOrder order: orders){
+                for (EmsOrder order : orders) {
                     page = new PDPage();
                     showEMSLabel(order);
                     WritableImage nodeshot = emsLabel.snapshot(new SnapshotParameters(), null);
-                    File file = new File(path +String.format("\\%s.png",order.getOrderno()));
+                    File file = new File(path + String.format("\\%s.png", order.getOrderno()));
                     ImageIO.write(SwingFXUtils.fromFXImage(nodeshot, null), "png", file);
                     pdimage = PDImageXObject.createFromFileByExtension(file, doc);
                     content = new PDPageContentStream(doc, page);
@@ -350,6 +380,48 @@ public class MainStageController implements Initializable {
             } catch (IOException ex) {
                 showMessageDialog(Alert.AlertType.ERROR, "提示", "错误信息", String.format("导出pdf异常:%s", ex.getMessage()));
             }
+        }
+    }
+
+
+    //导入订单批量打印
+    private void BatchPrint(List<EmsOrder> orders) {
+        try {
+            for (EmsOrder order : orders) {
+                Printer printer = Printer.getDefaultPrinter();
+                PageLayout paper = printer.createPageLayout(Paper.JAPANESE_POSTCARD, PageOrientation.PORTRAIT, 0, 0, 0, 0);
+                //创建打印任务
+                PrinterJob job = PrinterJob.createPrinterJob();
+                JobSettings jobSetting = null;
+                if (job != null) {
+                    showEMSLabel(order);
+                    jobSetting = job.getJobSettings();
+                    jobSetting.setCopies(1);   //设置一次打印张数
+                    double width = gridPane.getPrefWidth();
+                    double height = gridPane.getPrefHeight();
+                    PrintResolution resolution = job.getJobSettings().getPrintResolution();
+                    width /= resolution.getFeedResolution();
+                    height /= resolution.getCrossFeedResolution();
+                    double scaleX = paper.getPrintableWidth() / width / resolution.getFeedResolution();
+                    double scaleY = paper.getPrintableHeight() / height / resolution.getFeedResolution();
+                    Scale scale = new Scale(scaleX, scaleY);
+                    emsLabel.getTransforms().add(scale);
+
+                    if (job.printPage(paper, emsLabel)) {
+                        job.endJob();
+                    }
+
+                    emsLabel.getTransforms().remove(scale);
+                    //更新打印时间
+                    SimpleDateFormat ft = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    order.setPrintdate(ft.format(new Date()));
+                    emsOrderService.updateOrder(order);
+                } else {
+                    showMessageDialog(Alert.AlertType.ERROR, "提示", "错误信息", "创建打印任务失败");
+                }
+            }
+        } catch (Exception ex) {
+            showMessageDialog(Alert.AlertType.ERROR, "提示", "错误信息", String.format("批量打异常:%s", ex.getMessage()));
         }
     }
 
@@ -770,25 +842,26 @@ public class MainStageController implements Initializable {
     }
 
     @FXML
-    private void refresh(){
+    private void refresh() {
         orders.clear();
         orders.addAll(emsOrderService.getOrderList());
+        avaliableEmsOrderCount.setText(String.valueOf(emsOrderService.getAvaliableEmsOrderCount()));
     }
 
     @FXML
-    private void clearAll(){
+    private void clearAll() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("警告");
         alert.setHeaderText("清空所有数据？");
         alert.setContentText("确认清空所有的数据吗，不可恢复");
         Optional<ButtonType> result = alert.showAndWait();
-        if (result.get()==ButtonType.OK){
-           if( emsOrderService.clearAllData()){
-               refresh();
-               showMessageDialog(Alert.AlertType.INFORMATION,"提示", "", "数据已经清空");
-           }else{
-               showMessageDialog(Alert.AlertType.ERROR,"错误", "", "删除数据失败");
-           }
+        if (result.get() == ButtonType.OK) {
+            if (emsOrderService.clearAllData()) {
+                refresh();
+                showMessageDialog(Alert.AlertType.INFORMATION, "提示", "", "数据已经清空");
+            } else {
+                showMessageDialog(Alert.AlertType.ERROR, "错误", "", "删除数据失败");
+            }
         }
     }
 
@@ -819,7 +892,7 @@ public class MainStageController implements Initializable {
                         File file = fileChooser.showOpenDialog(MainApp.getStage());
 
                         if (file != null) {
-                            updateProgress(50,100);
+                            updateProgress(50, 100);
                             List<EmsOrder> list = ExcelHelper.ImportEmsOrderInfo2(file.getPath());
                             if (emsOrderService.updateEorderList(list)) {
                                 avaliableEmsOrderCount.setText(String.valueOf(emsOrderService.getAvaliableEmsOrderCount()));
@@ -832,7 +905,9 @@ public class MainStageController implements Initializable {
                         showMessageDialog(Alert.AlertType.ERROR, "提示", "错误信息", String.format("导入EMS订单异常:%s", e.getMessage()));
                     }
                     return null;
-                };
+                }
+
+                ;
             };
         }
     };

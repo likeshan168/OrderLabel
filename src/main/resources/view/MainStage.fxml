@@ -33,7 +33,7 @@
                     <items>
                         <MenuItem mnemonicParsing="false" onAction="#importEorderList" text="%ImportEMSNo"/>
                         <MenuItem mnemonicParsing="false" onAction="#importOrderList" text="%ImportOrderList"/>
-                        <MenuItem mnemonicParsing="false" onAction="#importOrderListAndExportPdf"
+                        <MenuItem mnemonicParsing="false" onAction="#importOrderListAndBatchPrint"
                                   text="%importOrderListAndExportPdf"/>
                         <MenuItem mnemonicParsing="false" onAction="#handleExportExcel" text="%ExportOrderList"/>
                         <MenuItem mnemonicParsing="false" onAction="#refresh" text="%Refresh"/>
@@ -268,7 +268,7 @@
                                                 <Button onAction="#printPage" prefWidth="100" text="打印"/>
                                                 <Label text="可用EMS单号数量："/>
                                                 <Label fx:id="avaliableEmsOrderCount" text="0"/>
-                                                <Button onAction="#deleteData" prefWidth="100" text="删除数据"/>
+                                                <Button onAction="#deleteData" prefWidth="100" text="删除已打印数据"/>
                                                 <DatePicker fx:id="datePicker" promptText="选择时间"/>
                                             </children>
                                         </HBox>
@@ -280,7 +280,7 @@
                                                 <TextField fx:id="yanshiField"/>
                                             </children>
                                         </HBox>
-                                        <ProgressBar prefWidth="300.0" progress="0.0" fx:id="progressBar"/>
+                                        <Label fx:id="printMsg"/>
                                     </children>
                                 </VBox>
                             </items>
